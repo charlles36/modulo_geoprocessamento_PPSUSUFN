@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Início{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>Upload de Relatório</h2>
+
+        {% if messages %}
+            <ul class="messages list-unstyled">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Enviar Relatório</button>
+
+</form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/get_relatorio_datas/')
+                .then(response => response.json())
+                .then(data => {
+                    const availableDates = data.datas.map(date => new Date(date));
+                    flatpickr(".short-date-input", {
+                        dateFormat: "Y-m-d",
+                        altInput: true,
+                        altFormat: "d/m/Y",
+                        locale: "pt",  // Configurar para português,
+                        onReady: function(selectedDates, dateStr, instance) {
+                            markDatesWithReports(instance, data.datas);
+                        },
+                        onMonthChange: function(selectedDates, dateStr, instance) {
+                            markDatesWithReports(instance, data.datas);
+                        }
+                    });
+
+                    function markDatesWithReports(instance, datas) {
+                        instance.calendarContainer.querySelectorAll(".flatpickr-day").forEach(dayElem => {
+                            const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+                            if (datas.includes(dateStr)) {
+                                dayElem.classList.add('has-report');
+                            }
+                        });
+                    }
+                });
+            // Ocultar mensagens após 5 segundos
+            setTimeout(function() {
+                const messages = document.querySelector('.messages');
+                if (messages) {
+                    messages.style.transition = "opacity 1s ease";
+                    messages.style.opacity = "0";
+                    setTimeout(() => messages.remove(), 1000); // Remove do DOM após a transição
+                }
+            }, 5000); // 5 segundos
+        });
+    </script>
+{% endblock %}

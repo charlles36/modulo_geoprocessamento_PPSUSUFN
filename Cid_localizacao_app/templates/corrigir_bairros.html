@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Corrigir Nomes dos Bairros</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .centered-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container centered-form">
+        <div class="form-container">
+            <h1 class="text-center">Corrigir Nomes dos Bairros</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% for bairro in bairros_incorretos %}
+                    <div class="form-group">
+                        <label for="bairro_{{ forloop.counter }}">{{ bairro }}</label>
+                        <select id="bairro_{{ forloop.counter }}" name="mapeamento" class="form-control">
+                            {% for bairro_correto in bairros_corretos %}
+                                <option value="{{ bairro }},{{ bairro_correto }}">{{ bairro_correto }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary btn-block">Salvar Mapeamentos</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

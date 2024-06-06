@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Início{% endblock %}
+
+{% block content %}
+    <h1>Casos de CID por Bairro</h1>
+    <form id="filterForm" onsubmit="getBairros(); return false;">
+        <div class="form-group">
+            <label for="cidSelector">Selecione o CID:</label>
+            <select id="cidSelector" class="form-control">
+                <option value="" disabled selected>Selecione um CID</option>
+
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="dataInicial">Data Inicial:</label>
+            <input type="date" id="dataInicial" class="form-control short-date-input">
+        </div>
+        <div class="form-group">
+            <label for="dataFinal">Data Final:</label>
+            <input type="date" id="dataFinal" class="form-control short-date-input">
+        </div>
+        <button type="submit" class="btn btn-primary">Visualizar Mapa</button>
+    </form>
+    <div id="bairroList"></div>
+
+    <script>
+        function getBairros() {
+            var cid = document.getElementById('cidSelector').value;
+            var dataInicial = document.getElementById('dataInicial').value;
+            var dataFinal = document.getElementById('dataFinal').value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById('bairroList').innerHTML = this.responseText;
+                }
+            };
+            xhttp.open('GET', '/get_bairros?cid=' + cid + '&data_inicial=' + dataInicial + '&data_final=' + dataFinal, true);
+            xhttp.send();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/get_cids')
+                .then(response => response.json())
+                .then(data => {
+                    const cidSelector = document.getElementById('cidSelector');
+                    data.cids.forEach(cid => {
+                        const option = document.createElement('option');
+                        option.value = cid.cid;
+                        option.textContent = `${cid.cid} - ${cid.descricao_cid}`;
+                        cidSelector.appendChild(option);
+                    });
+                });
+
+            const dataInicial = flatpickr("#dataInicial", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                locale: "pt"
+            });
+            const dataFinal = flatpickr("#dataFinal", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                locale: "pt"
+            });
+
+            document.getElementById('cidSelector').addEventListener('change', function() {
+                const cid = this.value;
+                if (cid) {
+                    fetch(`/get_datas?cid=${cid}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const availableDates = data.dates;
+                            dataInicial.set('enable', availableDates);
+                            dataFinal.set('enable', availableDates);
+                        });
+                }
+            });
+        });
+    </script>
+{% endblock %}
