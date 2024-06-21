@@ -1,10 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Início{% endblock %}
+{% block title %}Relatórios{% endblock %}
 
 {% block content %}
     <div class="container mt-5">
         <h2>Lista de Relatórios</h2>
+
+        {% if messages %}
+            <ul class="messages list-unstyled">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -19,6 +28,7 @@
                     <td>{{ relatorio.data }}</td>
                     <td>{{ relatorio.relatorio.name }}</td>
                     <td>
+                        <a href="{{ relatorio.relatorio.url }}" class="btn btn-success btn-sm" download>Download</a>
                         <form method="post" action="{% url 'delete_relatorio' relatorio.id %}" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja deletar este relatório e todos os dados relacionados?');">Deletar</button>
@@ -29,4 +39,18 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ocultar mensagens após 5 segundos
+            setTimeout(function() {
+                const messages = document.querySelector('.messages');
+                if (messages) {
+                    messages.style.transition = "opacity 1s ease";
+                    messages.style.opacity = "0";
+                    setTimeout(() => messages.remove(), 1000); // Remove do DOM após a transição
+                }
+            }, 5000); // 5 segundos
+        });
+    </script>
 {% endblock %}

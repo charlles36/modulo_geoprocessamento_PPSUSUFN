@@ -2,45 +2,43 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Corrigir Nomes dos Bairros</title>
+    <title>Correção de nomes dos bairros</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        .centered-form {
+        .correcao-bairros-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
         }
-        .form-container {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
+
+        .bairro-item {
+            margin: 10px 0;
+            width: 80%;
         }
     </style>
 </head>
 <body>
-    <div class="container centered-form">
-        <div class="form-container">
-            <h1 class="text-center">Corrigir Nomes dos Bairros</h1>
-            <form method="post">
-                {% csrf_token %}
-                {% for bairro in bairros_incorretos %}
-                    <div class="form-group">
-                        <label for="bairro_{{ forloop.counter }}">{{ bairro }}</label>
-                        <select id="bairro_{{ forloop.counter }}" name="mapeamento" class="form-control">
-                            {% for bairro_correto in bairros_corretos %}
-                                <option value="{{ bairro }},{{ bairro_correto }}">{{ bairro_correto }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary btn-block">Salvar Mapeamentos</button>
-            </form>
-        </div>
+    <div class="container mt-5 correcao-bairros-container">
+        <h1>Correção de nomes dos bairros</h1>
+        <p>Para ajudar na correção, visite o site com a <a href="https://leismunicipais.com.br/a/rs/s/santa-maria/lei-complementar/2006/4/42/lei-complementar-n-42-2006-cria-unidades-urbanas-altera-a-divisao-urbana-de-santa-maria-da-nova-denominacao-aos-bairros-e-revoga-a-lei-municipal-n-2770-86-de-02-071986-artigos-2-a-25-e-da-outras-providencias" target="_blank">Lei Complementar Nº 42/2006</a>
+            e <a href="https://www.openstreetmap.org/#map=12/-29.7067/-53.8402" target="_blank"> Openstreetmap.</a></p>
+        <form method="post">
+            {% csrf_token %}
+            {% for bairro in bairros_incorretos %}
+                <div class="form-group bairro-item">
+                    <label for="bairro_{{ forloop.counter }}">{{ bairro }}</label>
+                    <select id="bairro_{{ forloop.counter }}" name="mapeamento" class="form-control">
+                        <option value="" disabled selected hidden>Selecione o bairro correto</option>
+                        {% for bairro_correto in bairros_corretos %}
+                            <option value="{{ bairro }},{{ bairro_correto }}">{{ bairro_correto }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Salvar Mapeamentos</button>
+        </form>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

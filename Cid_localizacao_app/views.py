@@ -12,8 +12,10 @@ from django.contrib import messages
 from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from .forms import RelatorioForm
 from .models import Relatorio, Casos, CorrecaoBairro
+
 
 
 def index(request):
@@ -31,7 +33,7 @@ def delete_relatorio(request, relatorio_id):
     relatorio.relatorio.delete()  # Deleta o arquivo do sistema de arquivos
     relatorio.delete()  # Deleta o objeto do banco de dados
     messages.success(request, 'Relatório e dados relacionados deletados com sucesso!')
-    return redirect('lista_relatorios')
+    return redirect(reverse('lista_relatorios'))
 
 
 def transformar_dataframe(df):
@@ -102,7 +104,7 @@ def criar_grafico_bairros(bairros_merged, cid, descricao_cid, data_inicial, data
                  horizontalalignment='center')
         plt.text(row.geometry.centroid.x, row.geometry.centroid.y, f"{row['quantidade_casos']}", fontsize=10,
                  verticalalignment='top')
-    plt.title(f"Mapa de Bairros com Casos de CID {cid} - {descricao_cid} - {data_inicial} - {data_final}")
+    plt.tight_layout()
     return salvar_grafico(fig)
 
 
@@ -115,7 +117,6 @@ def criar_grafico_barras(bairros_merged, cid, descricao_cid):
                     ha='center', va='center',
                     size=10, xytext=(0, 8),
                     textcoords='offset points')
-    plt.title(f"Quantidade de Casos por Bairro para CID {cid} - {descricao_cid}")
     plt.xlabel("Bairros")
     plt.ylabel("Quantidade de Casos")
     plt.tight_layout()
@@ -125,20 +126,28 @@ def criar_grafico_barras(bairros_merged, cid, descricao_cid):
 
 
 def criar_grafico_casos_por_dia(casos_df, cid, descricao_cid):
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Calcular a largura do gráfico com base no número de dias
+    num_dias = (casos_df['data'].max() - casos_df['data'].min()).days + 1
+    largura = max(10, num_dias * 0.2)
+
+    fig, ax = plt.subplots(figsize=(largura, 6))
     ax.plot(casos_df['data'], casos_df['total_casos'], marker='o', linestyle='-')
     ax.xaxis.set_major_locator(mdates.DayLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%Y'))
+
     for i in range(len(casos_df)):
         ax.annotate(format(casos_df['total_casos'][i], '.0f'),
                     (casos_df['data'][i], casos_df['total_casos'][i]),
                     ha='center', va='bottom',
                     size=10, xytext=(0, 8),
                     textcoords='offset points')
-    plt.title(f"Quantidade de Casos por Dia para CID {cid} - {descricao_cid}")
+
+    fig.autofmt_xdate()
+    ax.grid(True)
     plt.xlabel("Data")
     plt.ylabel("Quantidade de Casos")
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=90, ha='right')
+
     plt.tight_layout()
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
@@ -209,6 +218,8 @@ def vincular_bairros(request):
     bairros_corretos = Bairros['NM_BAIRRO'].str.upper().str.strip().unique()
     return render(request, 'corrigir_bairros.html', {'bairros_incorretos': bairros_incorretos, 'bairros_corretos': bairros_corretos})
 
+def extrair_numero(cid):
+    return int(''.join(filter(str.isdigit, cid)))
 
 def get_relatorio_datas(request):
     datas = Relatorio.objects.values_list('data', flat=True).distinct()
@@ -217,7 +228,8 @@ def get_relatorio_datas(request):
 
 
 def get_cids(request):
-    cids = Casos.objects.values('cid', 'descricao_cid').distinct().order_by('cid')
+    cids = Casos.objects.values('cid', 'descricao_cid').distinct()
+    cids = sorted(cids, key=lambda x: (x['cid'][0], extrair_numero(x['cid'])))
     return JsonResponse({'cids': list(cids)})
 
 
