@@ -34,12 +34,13 @@ Para fazer o upload de um relatório:
 
 3.	Ao upar, se todos os bairros do relatório já estiverem identificados, você verá a mensagem de confirmação.
 
-Caso existam bairros para corrigir, você será direcionado para a página de correção. Nesta página:
+Caso existam bairros para corrigir, você será direcionado para a página de correção. 
+Nesta página:
 
-Utilize os links fornecidos para auxiliar na identificação:
+ - Utilize os links fornecidos para auxiliar na identificação:
 
-- [Lei Complementar Nº 42/2006](https://leismunicipais.com.br/a/rs/s/santa-maria/lei-complementar/2006/4/42/lei-complementar-n-42-2006-cria-unidades-urbanas-altera-a-divisao-urbana-de-santa-maria-da-nova-denominacao-aos-bairros-e-revoga-a-lei-municipal-n-2770-86-de-02-071986-artigos-2-a-25-e-da-outras-providencias)
-- [OpenStreetMap](https://www.openstreetmap.org/#map=12/-29.6885/-53.7997)
+   - [Lei Complementar Nº 42/2006](https://leismunicipais.com.br/a/rs/s/santa-maria/lei-complementar/2006/4/42/lei-complementar-n-42-2006-cria-unidades-urbanas-altera-a-divisao-urbana-de-santa-maria-da-nova-denominacao-aos-bairros-e-revoga-a-lei-municipal-n-2770-86-de-02-071986-artigos-2-a-25-e-da-outras-providencias)
+   - [OpenStreetMap](https://www.openstreetmap.org/#map=12/-29.6885/-53.7997)
 
       
 
