@@ -14,7 +14,7 @@ python -m venv venv
 
 pip install -r requirements.txt --use-pep517
 
-# Intruções
+# Instruções
 
 Ao acessar o projeto, você será direcionado para a página de geração de mapas. Siga os passos abaixo para gerar mapas e relatórios:
 
